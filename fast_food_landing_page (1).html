@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Food Delivery & Giveaways</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#FACC15',
+                        darkBg: '#0F0F0F',
+                        cardDark: '#1A1A1A',
+                        accentYellow: '#EAB308',
+                        warmYellow: '#FDE047'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom wave and shape styling */
+        .wave-bottom {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23FACC15' fill-opacity='1' d='M0,192L48,181.3C96,171,192,149,288,160C384,171,480,213,576,213.3C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .wave-top {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%230F0F0F' fill-opacity='1' d='M0,192L48,181.3C96,171,192,149,288,160C384,171,480,213,576,213.3C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .pattern-bg {
+            background-color: #FACC15;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-[#0F0F0F] text-white font-sans antialiased overflow-x-hidden selection:bg-yellow-400 selection:text-black">
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-yellow-400 text-black px-6 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-message">Action successful!</span>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="fixed top-0 left-0 w-full z-40 bg-[#0F0F0F]/90 backdrop-blur-md border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center text-black font-black text-xl shadow-lg group-hover:rotate-12 transition-transform">
+                    <i class="fa-solid fa-burger"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-wider text-white">FAST<span class="text-yellow-400">FOOD</span></span>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-zinc-300">
+                <a href="#hero" class="hover:text-yellow-400 transition-colors">Home</a>
+                <a href="#features" class="hover:text-yellow-400 transition-colors">About</a>
+                <a href="#menu" class="hover:text-yellow-400 transition-colors">Menu</a>
+                <a href="#giveaway" class="hover:text-yellow-400 transition-colors">Giveaway</a>
+                <a href="#team" class="hover:text-yellow-400 transition-colors">Team</a>
+                <a href="#hours" class="hover:text-yellow-400 transition-colors">Contact</a>
+            </nav>
+
+            <!-- Actions / Language / Profile -->
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center bg-zinc-800 rounded-full p-1 text-xs font-bold">
+                    <button id="lang-en" onclick="setLanguage('en')" class="bg-yellow-400 text-black px-3 py-1.5 rounded-full shadow transition-all">ENG</button>
+                    <button id="lang-ru" onclick="setLanguage('ru')" class="text-zinc-400 px-3 py-1.5 hover:text-white transition-all">RUS</button>
+                </div>
+                <button onclick="openCart()" class="relative p-2.5 bg-yellow-400 text-black rounded-xl hover:bg-yellow-300 transition-all font-bold shadow-lg flex items-center justify-center">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold shadow">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. Hero Section -->
+    <section id="hero" class="relative pt-32 pb-24 bg-[#0F0F0F] overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6 z-10">
+                <span id="t-hero-tag" class="inline-block bg-yellow-400/10 text-yellow-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-yellow-400/20 uppercase tracking-widest">
+                    ⚡ Lightning Fast Delivery
+                </span>
+                <h1 id="t-hero-title" class="text-4xl sm:text-6xl font-black tracking-tight leading-none text-white">
+                    Delicious Fast Food, <span class="text-yellow-400 underline decoration-yellow-400/40">Delivered Faster!</span>
+                </h1>
+                <p id="t-hero-desc" class="text-zinc-400 text-base sm:text-lg max-w-lg leading-relaxed">
+                    Hot, freshly prepared meals delivered to your door in 20 minutes or less. Enter your delivery address to get started.
+                </p>
+                <div class="pt-2 flex flex-wrap items-center gap-4">
+                    <a href="#menu" id="t-hero-btn" class="bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl shadow-xl hover:bg-yellow-300 hover:scale-105 transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-location-dot"></i> Find Nearby Meal
+                    </a>
+                </div>
+            </div>
+            <div class="relative flex justify-center">
+                <div class="absolute -inset-4 bg-gradient-to-tr from-yellow-400/20 to-transparent rounded-3xl blur-2xl"></div>
+                <img src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=800&q=80" alt="Delicious fast food combo with burgers and fries" class="relative rounded-3xl shadow-2xl object-cover w-full max-w-lg border-2 border-yellow-400/30 transform hover:scale-[1.02] transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/1a1a1a/facc15?text=Fast+Food+Combo'">
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Yellow Pattern Section -->
+    <div class="h-24 w-full bg-gradient-to-b from-[#0F0F0F] to-[#FACC15]"></div>
+
+    <!-- 2. Features / Fast, Free, & Rewarding Section -->
+    <section id="features" class="pattern-bg py-20 text-black relative">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <h2 id="t-feat-title" class="text-4xl sm:text-5xl font-black tracking-tight leading-tight text-zinc-900">
+                    Fast, Free, & Rewarding!
+                </h2>
+                <div class="space-y-4 text-zinc-800 font-medium text-base sm:text-lg">
+                    <div class="flex items-start gap-3 bg-white/60 p-4 rounded-2xl shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-bolt text-yellow-600 text-xl mt-1"></i>
+                        <p id="t-feat-1"><strong>20-min delivery:</strong> free on every bigger optional 15% loyal mystery order.</p>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/60 p-4 rounded-2xl shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-seedling text-green-700 text-xl mt-1"></i>
+                        <p id="t-feat-2"><strong>100% fresh:</strong> locally-sourced ingredients prepared on demand.</p>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/60 p-4 rounded-2xl shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-gift text-red-600 text-xl mt-1"></i>
+                        <p id="t-feat-3"><strong>Exclusive rewards:</strong> available with instant online carting.</p>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/60 p-4 rounded-2xl shadow-sm backdrop-blur-sm">
+                        <i class="fa-solid fa-truck-fast text-blue-700 text-xl mt-1"></i>
+                        <p id="t-feat-4"><strong>Realtime tracking:</strong> right to your doorstep and an instant order map — get what your palate craves.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-black/10 p-4 rounded-2xl backdrop-blur-md border border-black/10 shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80" alt="Burger & Fries" class="rounded-xl w-full h-48 object-cover shadow mb-3" onerror="this.src='https://placehold.co/400x300/000000/facc15?text=Juicy+Burger'">
+                    <h3 id="t-card-1-title" class="font-black text-lg text-zinc-900">Gourmet Beef Burger</h3>
+                    <p id="t-card-1-desc" class="text-xs text-zinc-700 mt-1">Double patty with cheddar & secret sauce.</p>
+                </div>
+                <div class="bg-black/10 p-4 rounded-2xl backdrop-blur-md border border-black/10 shadow-lg mt-0 sm:mt-8">
+                    <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80" alt="Crispy fries" class="rounded-xl w-full h-48 object-cover shadow mb-3" onerror="this.src='https://placehold.co/400x300/000000/facc15?text=Crispy+Fries'">
+                    <h3 id="t-card-2-title" class="font-black text-lg text-zinc-900">Golden Fries Combo</h3>
+                    <p id="t-card-2-desc" class="text-xs text-zinc-700 mt-1">Crispy fries served with signature dip.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Black Section -->
+    <div class="h-24 w-full bg-gradient-to-b from-[#FACC15] to-[#0F0F0F]"></div>
+
+    <!-- 3. Freshness Showcase & Eco Friendly -->
+    <section class="py-20 bg-[#0F0F0F] relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80" alt="Fresh French fries basket with ketchup" class="rounded-3xl shadow-2xl border border-zinc-800 w-full object-cover h-[350px]" onerror="this.src='https://placehold.co/600x400/1a1a1a/facc15?text=Fresh+Fries'">
+            </div>
+            <div class="space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
+                <span id="t-fresh-tag" class="text-yellow-400 font-bold uppercase tracking-widest text-xs">Quality Guarantee</span>
+                <h2 id="t-fresh-title" class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                    Freshness in Every Order!
+                </h2>
+                <p id="t-fresh-subtitle" class="text-xl font-bold text-yellow-400">Our secret? 100% fresh ingredients!</p>
+                <p id="t-fresh-desc" class="text-zinc-400 text-sm leading-relaxed max-w-md">
+                    We handpick vegetables daily and partner with ethical local farms to ensure every bite bursts with crisp, natural flavor and nutritional excellence.
+                </p>
+                <!-- Eco Badge -->
+                <div class="mt-4 flex items-center gap-4 bg-zinc-900 border border-yellow-400/30 px-6 py-3 rounded-2xl shadow-xl">
+                    <div class="w-12 h-12 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-400 text-2xl">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div class="text-left">
+                        <div id="t-eco-title" class="text-yellow-400 font-extrabold text-sm tracking-wider">ECO FRIENDLY</div>
+                        <div id="t-eco-desc" class="text-zinc-400 text-xs">100% Biodegradable Packaging</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 100% Halal Certified Section -->
+    <section class="py-20 bg-gradient-to-b from-[#0F0F0F] via-zinc-900 to-[#0F0F0F] border-y border-zinc-800">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <div class="inline-flex items-center gap-2 bg-yellow-400/10 text-yellow-400 px-4 py-1.5 rounded-lg text-xs font-bold border border-yellow-400/20">
+                    <i class="fa-solid fa-certificate"></i> <span id="t-halal-badge">Certified Quality</span>
+                </div>
+                <h2 id="t-halal-title" class="text-4xl sm:text-5xl font-black text-yellow-400 tracking-tight">
+                    100% Halal Certified
+                </h2>
+                <p id="t-halal-desc" class="text-zinc-300 text-base sm:text-lg leading-relaxed">
+                    Our menu includes halal options, we guarantee a clean recipe with no hidden additives! Prepared strictly under Islamic dietary guidelines with utmost hygiene.
+                </p>
+                <div class="flex items-center gap-6 pt-2">
+                    <div id="t-halal-1" class="flex items-center gap-2 text-zinc-300 text-sm font-semibold">
+                        <i class="fa-solid fa-check text-yellow-400"></i> Pure Meat
+                    </div>
+                    <div id="t-halal-2" class="flex items-center gap-2 text-zinc-300 text-sm font-semibold">
+                        <i class="fa-solid fa-check text-yellow-400"></i> No Preservatives
+                    </div>
+                    <div id="t-halal-3" class="flex items-center gap-2 text-zinc-300 text-sm font-semibold">
+                        <i class="fa-solid fa-check text-yellow-400"></i> Verified Source
+                    </div>
+                </div>
+            </div>
+            <!-- Halal Badge Graphic -->
+            <div class="flex justify-center">
+                <div class="relative w-64 h-64 bg-yellow-400 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-6 transform hover:rotate-3 transition-transform border-4 border-yellow-500">
+                    <div class="absolute inset-2 border-2 border-black/20 rounded-2xl"></div>
+                    <span class="text-5xl font-black text-black tracking-widest mb-1">حلال</span>
+                    <span class="text-black font-extrabold text-xl tracking-widest mt-2 uppercase">HALAL</span>
+                    <span id="t-halal-sub" class="text-[10px] text-black/80 font-bold tracking-widest mt-1">VERIFIED CERTIFIED</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Yellow Pattern Section (Giveaway) -->
+    <div class="h-24 w-full bg-gradient-to-b from-[#0F0F0F] to-[#FACC15]"></div>
+
+    <!-- 5. Promo Giveaway Section -->
+    <section id="giveaway" class="pattern-bg py-20 text-black relative">
+        <div class="max-w-7xl mx-auto px-6 text-center space-y-12">
+            <div class="max-w-2xl mx-auto space-y-4">
+                <span id="t-giveaway-tag" class="bg-black text-yellow-400 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">Grand Giveaway</span>
+                <h2 id="t-giveaway-title" class="text-3xl sm:text-5xl font-black text-zinc-900 tracking-tight">
+                    It’s more enjoyable to drive to your favorite fast-food spot!
+                </h2>
+            </div>
+
+            <!-- Steps Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div class="bg-white/70 backdrop-blur-md p-8 rounded-3xl shadow-lg border border-black/10 relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-black text-yellow-400 font-black rounded-xl flex items-center justify-center text-lg shadow">1</div>
+                    <h3 id="t-step-1-title" class="text-xl font-black text-zinc-900 mb-2">Order your favorites</h3>
+                    <p id="t-step-1-desc" class="text-zinc-700 text-sm">Place any order online or in-store to automatically earn entries into our grand car giveaway pool.</p>
+                </div>
+                <div class="bg-white/70 backdrop-blur-md p-8 rounded-3xl shadow-lg border border-black/10 relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-black text-yellow-400 font-black rounded-xl flex items-center justify-center text-lg shadow">2</div>
+                    <h3 id="t-step-2-title" class="text-xl font-black text-zinc-900 mb-2">Get a TICKET with every receipt</h3>
+                    <p id="t-step-2-desc" class="text-zinc-700 text-sm">Each receipt comes with a unique ticket code that multiplies your winning chances.</p>
+                </div>
+                <div class="bg-white/70 backdrop-blur-md p-8 rounded-3xl shadow-lg border border-black/10 relative">
+                    <div class="absolute -top-4 -left-4 w-10 h-10 bg-black text-yellow-400 font-black rounded-xl flex items-center justify-center text-lg shadow">3</div>
+                    <h3 id="t-step-3-title" class="text-xl font-black text-zinc-900 mb-2">Join the grand giveaway</h3>
+                    <p id="t-step-3-desc" class="text-zinc-700 text-sm">Watch our monthly live stream to see if your ticket is drawn for the ultimate prize.</p>
+                </div>
+            </div>
+
+            <!-- Giveaway Prize Banner with Clear Car Photo -->
+            <div class="bg-black text-white p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8 border-2 border-yellow-400">
+                <div class="text-left space-y-3">
+                    <span id="t-car-tag" class="text-yellow-400 font-bold uppercase tracking-wider text-xs">Win Big This Month</span>
+                    <h3 id="t-car-title" class="text-2xl sm:text-4xl font-black">Win a fourth-generation Skoda Octavia!</h3>
+                    <p id="t-car-desc" class="text-zinc-400 text-sm max-w-lg">Brand new Skoda Octavia IV loaded with top-tier tech, comfort, and safety features. Your lunch order could drive you home.</p>
+                </div>
+                <div class="relative group w-full lg:w-auto flex justify-center">
+                    <div class="absolute -inset-2 bg-yellow-400 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
+                    <img src="https://images.unsplash.com/photo-1617469767053-d3b523a0b982?auto=format&fit=crop&w=700&q=80" alt="Fourth-generation Skoda Octavia IV Grand Prize Car" class="relative rounded-2xl shadow-2xl w-full sm:w-[420px] object-cover h-60 border-2 border-yellow-400 transform group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/500x300/1a1a1a/facc15?text=Skoda+Octavia+IV'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Black Section -->
+    <div class="h-24 w-full bg-gradient-to-b from-[#FACC15] to-[#0F0F0F]"></div>
+
+    <!-- 6. Menu / Interactive Food Store Section -->
+    <section id="menu" class="py-20 bg-[#0F0F0F]">
+        <div class="max-w-7xl mx-auto px-6 space-y-12">
+            <div class="text-center space-y-3">
+                <span id="t-menu-tag" class="text-yellow-400 font-bold uppercase tracking-widest text-xs">Our Menu</span>
+                <h2 id="t-menu-title" class="text-3xl sm:text-5xl font-black text-white tracking-tight">Choose What You Crave</h2>
+                <p id="t-menu-desc" class="text-zinc-400 text-sm max-w-md mx-auto">Click 'Add to Order' to instantly add meals to your cart and claim your rewards.</p>
+            </div>
+
+            <!-- Menu Grid -->
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Javascript will populate menu items here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Heroes of Your Lunch (Team) -->
+    <section id="team" class="py-20 bg-zinc-950 border-t border-zinc-900">
+        <div class="max-w-7xl mx-auto px-6 space-y-12">
+            <div class="text-center space-y-3">
+                <span id="t-team-tag" class="text-yellow-400 font-bold uppercase tracking-widest text-xs">Our Experts</span>
+                <h2 id="t-team-title" class="text-3xl sm:text-5xl font-black text-white tracking-tight">Heroes of Your Lunch!</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Team Member 1 -->
+                <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-xl flex flex-col items-center text-center space-y-4 group hover:border-yellow-400 transition-colors">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=300&q=80" alt="Dominic Grill Master" class="relative w-32 h-32 rounded-full object-cover border-4 border-yellow-400 shadow-lg" onerror="this.src='https://placehold.co/200x200/1a1a1a/facc15?text=Dominic'">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-white">Dominic</h3>
+                        <p id="t-dom-role" class="text-yellow-400 font-bold text-sm">Grill Master <i class="fa-solid fa-hat-chef ml-1"></i></p>
+                    </div>
+                    <p id="t-dom-desc" class="text-zinc-400 text-xs leading-relaxed">
+                        "I closely check the grill temperature before every shift. As founder & chef, the Golden Cheeseburger is my ultimate art!"
+                    </p>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-xl flex flex-col items-center text-center space-y-4 group hover:border-yellow-400 transition-colors">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" alt="Mark Lightning Fast Delivery" class="relative w-32 h-32 rounded-full object-cover border-4 border-yellow-400 shadow-lg" onerror="this.src='https://placehold.co/200x200/1a1a1a/facc15?text=Mark'">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-white">Mark</h3>
+                        <p id="t-mark-role" class="text-yellow-400 font-bold text-sm">Lightning-fast delivery <i class="fa-solid fa-motorcycle ml-1"></i></p>
+                    </div>
+                    <p id="t-mark-desc" class="text-zinc-400 text-xs leading-relaxed">
+                        "Time management is my superpower. I manage swift routes to ensure your lunch arrives piping hot and fresh!"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Yellow Pattern Section (Hours & Promo) -->
+    <div class="h-24 w-full bg-gradient-to-b from-zinc-950 to-[#FACC15]"></div>
+
+    <!-- 8. We Are Open & Secret Promo Code Section -->
+    <section id="hours" class="pattern-bg py-20 text-black">
+        <div class="max-w-4xl mx-auto px-6 space-y-16 text-center">
+            
+            <!-- Working Hours Card -->
+            <div class="bg-white/80 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-black/10 space-y-6">
+                <h2 id="t-hours-title" class="text-4xl sm:text-5xl font-black text-zinc-900 tracking-tight">We are Open</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                    <div class="p-6 bg-yellow-400/20 rounded-2xl border border-yellow-400/40">
+                        <i class="fa-regular fa-clock text-2xl text-yellow-600 mb-2"></i>
+                        <h3 id="t-day-1" class="font-black text-lg text-zinc-900">Monday – Friday</h3>
+                        <p class="text-zinc-700 font-semibold text-sm mt-1">10:00 am – 10:00 pm</p>
+                    </div>
+                    <div class="p-6 bg-yellow-400/20 rounded-2xl border border-yellow-400/40">
+                        <i class="fa-regular fa-clock text-2xl text-yellow-600 mb-2"></i>
+                        <h3 id="t-day-2" class="font-black text-lg text-zinc-900">Saturday and Sunday</h3>
+                        <p class="text-zinc-700 font-semibold text-sm mt-1">10:00 am – 10:10 pm</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secret Promo Code Box -->
+            <div class="bg-black text-white p-10 rounded-3xl shadow-2xl space-y-6 border-2 border-yellow-400">
+                <span id="t-secret-tag" class="bg-yellow-400 text-black font-extrabold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider">Secret Reward</span>
+                <h3 id="t-secret-title" class="text-2xl sm:text-4xl font-black">You’ve read all the way to the end! Here’s a secret promo code for you!</h3>
+                <p id="t-secret-sub" class="text-zinc-400 text-sm">Use a <span class="text-yellow-400 font-bold">15% discount</span> on your order!</p>
+                <div>
+                    <button onclick="copyPromoCode()" class="bg-yellow-400 text-black font-black text-xl px-10 py-4 rounded-2xl shadow-xl hover:bg-yellow-300 hover:scale-105 transition-all tracking-wider inline-flex items-center gap-3">
+                        <i class="fa-solid fa-tag"></i> BOTTOM15
+                    </button>
+                </div>
+                <p id="t-warning" class="text-[11px] text-red-400 font-bold tracking-wide uppercase pt-2">
+                    ⚠️ WARNING: Browsing this website may cause excessive salvation. We accept no responsibility for any late night snacking binges that may to lead!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wavy Separator -> Footer Dark -->
+    <div class="h-24 w-full bg-gradient-to-b from-[#FACC15] to-[#0F0F0F]"></div>
+
+    <!-- 9. Footer -->
+    <footer class="bg-[#0F0F0F] text-zinc-400 py-16 border-t border-zinc-900">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="space-y-4 md:col-span-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center text-black font-black text-xl">
+                        <i class="fa-solid fa-burger"></i>
+                    </div>
+                    <span class="text-xl font-extrabold tracking-wider text-white">FAST<span class="text-yellow-400">FOOD</span></span>
+                </div>
+                <p id="t-footer-desc" class="text-sm text-zinc-500 max-w-sm leading-relaxed">
+                    Delivering delicious, hot, and 100% halal fast food right to your doorstep in 20 minutes or less. Taste the quality in every bite.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <h4 id="t-footer-info" class="text-white font-bold text-sm tracking-widest uppercase">Information</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#features" class="hover:text-yellow-400 transition-colors">About Us</a></li>
+                    <li><a href="#menu" class="hover:text-yellow-400 transition-colors">Our Menu</a></li>
+                    <li><a href="#giveaway" class="hover:text-yellow-400 transition-colors">Giveaway</a></li>
+                    <li><a href="#team" class="hover:text-yellow-400 transition-colors">Our Team</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-3">
+                <h4 id="t-footer-contact" class="text-white font-bold text-sm tracking-widest uppercase">Contact Us</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><span class="text-zinc-200 font-semibold">Support:</span> support@aldigfast.net</li>
+                    <li><span class="text-zinc-200 font-semibold">Phone:</span> +1 (800) 555-FAST</li>
+                    <li><span class="text-zinc-200 font-semibold">Hours:</span> Mon-Sun (10am - 10pm)</li>
+                </ul>
+            </div>
+        </div>
+        <div id="t-copyright" class="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-zinc-900 text-center text-xs text-zinc-600">
+            &copy; 2026 Fast Food Delivery. All rights reserved. Designed with passion & high-speed delivery in mind.
+        </div>
+    </footer>
+
+    <!-- Cart Modal Drawer -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex justify-end transition-all">
+        <div class="w-full max-w-md bg-[#1A1A1A] h-full shadow-2xl flex flex-col border-l border-zinc-800 p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-zinc-800">
+                <h3 class="text-xl font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-yellow-400"></i> Your Order
+                </h3>
+                <button onclick="closeCart()" class="text-zinc-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- Cart Items Container -->
+            <div id="cart-items" class="flex-1 overflow-y-auto py-4 space-y-4">
+                <p class="text-zinc-500 text-center py-12">Your cart is currently empty.</p>
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="border-t border-zinc-800 pt-4 space-y-4">
+                <div class="flex items-center justify-between text-lg font-black">
+                    <span class="text-zinc-400">Total:</span>
+                    <span id="cart-total" class="text-yellow-400">$0.00</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-yellow-400 text-black font-black py-4 rounded-xl shadow-lg hover:bg-yellow-300 transition-all text-center tracking-wide">
+                    Proceed to Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Translations Dictionary for EN / RU
+        const translations = {
+            en: {
+                heroTag: "⚡ Lightning Fast Delivery",
+                heroTitle: 'Delicious Fast Food, <span class="text-yellow-400 underline decoration-yellow-400/40">Delivered Faster!</span>',
+                heroDesc: "Hot, freshly prepared meals delivered to your door in 20 minutes or less. Enter your delivery address to get started.",
+                heroBtn: '<i class="fa-solid fa-location-dot"></i> Find Nearby Meal',
+                featTitle: "Fast, Free, & Rewarding!",
+                feat1: "<strong>20-min delivery:</strong> free on every bigger optional 15% loyal mystery order.",
+                feat2: "<strong>100% fresh:</strong> locally-sourced ingredients prepared on demand.",
+                feat3: "<strong>Exclusive rewards:</strong> available with instant online carting.",
+                feat4: "<strong>Realtime tracking:</strong> right to your doorstep and an instant order map — get what your palate craves.",
+                card1Title: "Gourmet Beef Burger",
+                card1Desc: "Double patty with cheddar & secret sauce.",
+                card2Title: "Golden Fries Combo",
+                card2Desc: "Crispy fries served with signature dip.",
+                freshTag: "Quality Guarantee",
+                freshTitle: "Freshness in Every Order!",
+                freshSubtitle: "Our secret? 100% fresh ingredients!",
+                freshDesc: "We handpick vegetables daily and partner with ethical local farms to ensure every bite bursts with crisp, natural flavor and nutritional excellence.",
+                ecoTitle: "ECO FRIENDLY",
+                ecoDesc: "100% Biodegradable Packaging",
+                halalBadge: "Certified Quality",
+                halalTitle: "100% Halal Certified",
+                halalDesc: "Our menu includes halal options, we guarantee a clean recipe with no hidden additives! Prepared strictly under Islamic dietary guidelines with utmost hygiene.",
+                halal1: "Pure Meat",
+                halal2: "No Preservatives",
+                halal3: "Verified Source",
+                halalSub: "VERIFIED CERTIFIED",
+                giveawayTag: "Grand Giveaway",
+                giveawayTitle: "It’s more enjoyable to drive to your favorite fast-food spot!",
+                step1Title: "Order your favorites",
+                step1Desc: "Place any order online or in-store to automatically earn entries into our grand car giveaway pool.",
+                step2Title: "Get a TICKET with every receipt",
+                step2Desc: "Each receipt comes with a unique ticket code that multiplies your winning chances.",
+                step3Title: "Join the grand giveaway",
+                step3Desc: "Watch our monthly live stream to see if your ticket is drawn for the ultimate prize.",
+                carTag: "Win Big This Month",
+                carTitle: "Win a fourth-generation Skoda Octavia!",
+                carDesc: "Brand new hatchback loaded with top-tier tech, comfort, and safety features. Your lunch order could drive you home.",
+                menuTag: "Our Menu",
+                menuTitle: "Choose What You Crave",
+                menuDesc: "Click 'Add to Order' to instantly add meals to your cart and claim your rewards.",
+                teamTag: "Our Experts",
+                teamTitle: "Heroes of Your Lunch!",
+                domRole: 'Grill Master <i class="fa-solid fa-hat-chef ml-1"></i>',
+                domDesc: '"I closely check the grill temperature before every shift. As founder & chef, the Golden Cheeseburger is my ultimate art!"',
+                markRole: 'Lightning-fast delivery <i class="fa-solid fa-motorcycle ml-1"></i>',
+                markDesc: '"Time management is my superpower. I manage swift routes to ensure your lunch arrives piping hot and fresh!"',
+                hoursTitle: "We are Open",
+                day1: "Monday – Friday",
+                day2: "Saturday and Sunday",
+                secretTag: "Secret Reward",
+                secretTitle: "You’ve read all the way to the end! Here’s a secret promo code for you!",
+                secretSub: 'Use a <span class="text-yellow-400 font-bold">15% discount</span> on your order!',
+                warning: "⚠️ WARNING: Browsing this website may cause excessive salvation. We accept no responsibility for any late night snacking binges that may to lead!",
+                footerDesc: "Delivering delicious, hot, and 100% halal fast food right to your doorstep in 20 minutes or less. Taste the quality in every bite.",
+                footerInfo: "Information",
+                footerContact: "Contact Us",
+                copyright: "&copy; 2026 Fast Food Delivery. All rights reserved. Designed with passion & high-speed delivery in mind."
+            },
+            ru: {
+                heroTag: "⚡ Быстрая Доставка",
+                heroTitle: 'Вкусный фастфуд, <span class="text-yellow-400 underline decoration-yellow-400/40">доставленный быстрее!</span>',
+                heroDesc: "Горячие, свежеприготовленные блюда с доставкой до вашей двери за 20 минут или быстрее. Введите адрес, чтобы начать.",
+                heroBtn: '<i class="fa-solid fa-location-dot"></i> Найти заказ рядом',
+                featTitle: "Быстро, Бесплатно и с Наградами!",
+                feat1: "<strong>Доставка за 20 минут:</strong> бесплатно для каждого большего заказа с секретным бонусом 15%.",
+                feat2: "<strong>100% свежесть:</strong> локальные ингредиенты высочайшего качества.",
+                feat3: "<strong>Эксклюзивные награды:</strong> доступны при онлайн-заказе.",
+                feat4: "<strong>Интерактивное отслеживание:</strong> прямо до вашей двери на карте — получите то, чего желает ваш аппетит.",
+                card1Title: "Фирменный Чизбургер",
+                card1Desc: "Двойная котлета с чеддером и секретным соусом.",
+                card2Title: "Золотистый Картофель Фри",
+                card2Desc: "Хрустящий картофель фри с фирменным соусом.",
+                freshTag: "Гарантия Качества",
+                freshTitle: "Свежесть в Каждом Заказе!",
+                freshSubtitle: "Наш секрет? 100% свежие ингредиенты!",
+                freshDesc: "Мы ежедневно отбираем овощи и сотрудничаем с проверенными фермами, чтобы каждый кусочек радовал вас естественным вкусом.",
+                ecoTitle: "ЭКОЛОГИЧНО",
+                ecoDesc: "100% Биоразлагаемая Упаковка",
+                halalBadge: "Сертифицированное Качество",
+                halalTitle: "100% Халяль Сертификат",
+                halalDesc: "Наше меню включает халяль опции, гарантируем чистый состав без скрытых добавок! Приготовлено с соблюдением строгих стандартов чистоты.",
+                halal1: "Чистое Мясо",
+                halal2: "Без Консервантов",
+                halal3: "Проверенный Источник",
+                halalSub: "ПРОВЕРЕНО И СЕРТИФИЦИРОВАНО",
+                giveawayTag: "Главный Розыгрыш",
+                giveawayTitle: "В любимое место фастфуда еще приятнее приезжать на машине!",
+                step1Title: "Заказывайте любимые блюда",
+                step1Desc: "Оформите заказ онлайн или в ресторане, чтобы автоматически получить билеты на розыгрыш автомобиля.",
+                step2Title: "Получайте БИЛЕТ с каждым чеком",
+                step2Desc: "К каждому чеку прилагается уникальный код билета, увеличивающий ваши шансы на победу.",
+                step3Title: "Участвуйте в розыгрыше",
+                step3Desc: "Смотрите наш ежемесячный прямой эфир, чтобы узнать, чей билет выиграет суперприз.",
+                carTag: "Главный Приз Месяца",
+                carTitle: "Выиграйте Skoda Octavia четвёртого поколения!",
+                carDesc: "Совершенно новый хэтчбек с передовыми технологиями, комфортом и системами безопасности. Ваш заказ может привезти вас домой.",
+                menuTag: "Наше Меню",
+                menuTitle: "Выберите То, Что Желаете",
+                menuDesc: "Нажмите 'Добавить в заказ', чтобы мгновенно добавить блюдо в корзину и получить награды.",
+                teamTag: "Наши Эксперты",
+                teamTitle: "Герои Вашего Обеда!",
+                domRole: 'Мастер Гриля <i class="fa-solid fa-hat-chef ml-1"></i>',
+                domDesc: '"Я тщательно проверяю температуру гриля перед каждой сменой. Золотой чизбургер — это мое высшее искусство!"',
+                markRole: 'Быстрая доставка <i class="fa-solid fa-motorcycle ml-1"></i>',
+                markDesc: '"Управление временем — моя суперсила. Я выбираю быстрые маршруты, чтобы ваш обед прибыл горячим и свежим!"',
+                hoursTitle: "Мы Открыты",
+                day1: "Понедельник – Пятница",
+                day2: "Суббота и Воскресенье",
+                secretTag: "Секретный Бонус",
+                secretTitle: "Вы дочитали до самого конца! Вот вам секретный промокод!",
+                secretSub: 'Используйте <span class="text-yellow-400 font-bold">скидку 15%</span> на ваш заказ!',
+                warning: "⚠️ ВНИМАНИЕ: Просмотр этого сайта может вызвать повышенное слюноотделение. Мы не несем ответственности за ночные перекусы, к которым это может привести!",
+                footerDesc: "Доставка вкусного, горячего и 100% халяльного фастфуда до вашей двери за 20 минут или быстрее. Наслаждайтесь вкусом.",
+                footerInfo: "Информация",
+                footerContact: "Контакты",
+                copyright: "&copy; 2026 Доставка Фастфуда. Все права защищены. Создано с любовью и быстрой доставкой."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            // Update Lang Buttons Style
+            if (lang === 'en') {
+                document.getElementById('lang-en').className = "bg-yellow-400 text-black px-3 py-1.5 rounded-full shadow transition-all";
+                document.getElementById('lang-ru').className = "text-zinc-400 px-3 py-1.5 hover:text-white transition-all";
+            } else {
+                document.getElementById('lang-ru').className = "bg-yellow-400 text-black px-3 py-1.5 rounded-full shadow transition-all";
+                document.getElementById('lang-en').className = "text-zinc-400 px-3 py-1.5 hover:text-white transition-all";
+            }
+
+            // Assign text content safely
+            document.getElementById('t-hero-tag').innerText = t.heroTag;
+            document.getElementById('t-hero-title').innerHTML = t.heroTitle;
+            document.getElementById('t-hero-desc').innerText = t.heroDesc;
+            document.getElementById('t-hero-btn').innerHTML = t.heroBtn;
+
+            document.getElementById('t-feat-title').innerText = t.featTitle;
+            document.getElementById('t-feat-1').innerHTML = t.feat1;
+            document.getElementById('t-feat-2').innerHTML = t.feat2;
+            document.getElementById('t-feat-3').innerHTML = t.feat3;
+            document.getElementById('t-feat-4').innerHTML = t.feat4;
+
+            document.getElementById('t-card-1-title').innerText = t.card1Title;
+            document.getElementById('t-card-1-desc').innerText = t.card1Desc;
+            document.getElementById('t-card-2-title').innerText = t.card2Title;
+            document.getElementById('t-card-2-desc').innerText = t.card2Desc;
+
+            document.getElementById('t-fresh-tag').innerText = t.freshTag;
+            document.getElementById('t-fresh-title').innerText = t.freshTitle;
+            document.getElementById('t-fresh-subtitle').innerText = t.freshSubtitle;
+            document.getElementById('t-fresh-desc').innerText = t.freshDesc;
+            document.getElementById('t-eco-title').innerText = t.ecoTitle;
+            document.getElementById('t-eco-desc').innerText = t.ecoDesc;
+
+            document.getElementById('t-halal-badge').innerText = t.halalBadge;
+            document.getElementById('t-halal-title').innerText = t.halalTitle;
+            document.getElementById('t-halal-desc').innerText = t.halalDesc;
+            document.getElementById('t-halal-1').innerHTML = `<i class="fa-solid fa-check text-yellow-400"></i> ${t.halal1}`;
+            document.getElementById('t-halal-2').innerHTML = `<i class="fa-solid fa-check text-yellow-400"></i> ${t.halal2}`;
+            document.getElementById('t-halal-3').innerHTML = `<i class="fa-solid fa-check text-yellow-400"></i> ${t.halal3}`;
+            document.getElementById('t-halal-sub').innerText = t.halalSub;
+
+            document.getElementById('t-giveaway-tag').innerText = t.giveawayTag;
+            document.getElementById('t-giveaway-title').innerText = t.giveawayTitle;
+            document.getElementById('t-step-1-title').innerText = t.step1Title;
+            document.getElementById('t-step-1-desc').innerText = t.step1Desc;
+            document.getElementById('t-step-2-title').innerText = t.step2Title;
+            document.getElementById('t-step-2-desc').innerText = t.step2Desc;
+            document.getElementById('t-step-3-title').innerText = t.step3Title;
+            document.getElementById('t-step-3-desc').innerText = t.step3Desc;
+
+            document.getElementById('t-car-tag').innerText = t.carTag;
+            document.getElementById('t-car-title').innerText = t.carTitle;
+            document.getElementById('t-car-desc').innerText = t.carDesc;
+
+            document.getElementById('t-menu-tag').innerText = t.menuTag;
+            document.getElementById('t-menu-title').innerText = t.menuTitle;
+            document.getElementById('t-menu-desc').innerText = t.menuDesc;
+
+            document.getElementById('t-team-tag').innerText = t.teamTag;
+            document.getElementById('t-team-title').innerText = t.teamTitle;
+            document.getElementById('t-dom-role').innerHTML = t.domRole;
+            document.getElementById('t-dom-desc').innerText = t.domDesc;
+            document.getElementById('t-mark-role').innerHTML = t.markRole;
+            document.getElementById('t-mark-desc').innerText = t.markDesc;
+
+            document.getElementById('t-hours-title').innerText = t.hoursTitle;
+            document.getElementById('t-day-1').innerText = t.day1;
+            document.getElementById('t-day-2').innerText = t.day2;
+
+            document.getElementById('t-secret-tag').innerText = t.secretTag;
+            document.getElementById('t-secret-title').innerText = t.secretTitle;
+            document.getElementById('t-secret-sub').innerHTML = t.secretSub;
+            document.getElementById('t-warning').innerText = t.warning;
+
+            document.getElementById('t-footer-desc').innerText = t.footerDesc;
+            document.getElementById('t-footer-info').innerText = t.footerInfo;
+            document.getElementById('t-footer-contact').innerText = t.footerContact;
+            document.getElementById('t-copyright').innerHTML = t.copyright;
+        }
+
+        // Menu Data
+        const menuItems = [
+            {
+                id: 1,
+                name: "Golden Double Cheeseburger",
+                category: "Burgers",
+                price: 12.99,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80",
+                desc: "Two juicy beef patties, double cheddar cheese, and signature tangy sauce."
+            },
+            {
+                id: 2,
+                name: "Crispy Golden Fries",
+                category: "Sides",
+                price: 4.99,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80",
+                desc: "Golden crispy potato fries sprinkled with sea salt & served with garlic dip."
+            },
+            {
+                id: 3,
+                name: "Spicy Chicken Burger",
+                category: "Burgers",
+                price: 10.99,
+                rating: 4.7,
+                image: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=500&q=80",
+                desc: "Crispy fried chicken fillet coated in spicy buffalo glaze with crisp lettuce."
+            },
+            {
+                id: 4,
+                name: "Loaded Cheese Nuggets",
+                category: "Sides",
+                price: 6.99,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=500&q=80",
+                desc: "Melted mozzarella cheese bites fried to golden crispy perfection."
+            },
+            {
+                id: 5,
+                name: "Refreshing Cola Bomb",
+                category: "Beverages",
+                price: 3.49,
+                rating: 4.6,
+                image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80",
+                desc: "Ice-cold sparkling cola served with crushed ice and fresh lime slice."
+            },
+            {
+                id: 6,
+                name: "Ultimate Feast Combo",
+                category: "Combos",
+                price: 24.99,
+                rating: 5.0,
+                image: "https://images.unsplash.com/photo-1610440042657-612c34d95e4f?auto=format&fit=crop&w=500&q=80",
+                desc: "Includes 2 Burgers, Large Fries, Nuggets, and 2 Drinks + Giveaway Ticket!"
+            }
+        ];
+
+        let cart = [];
+
+        // Render Menu
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = menuItems.map(item => `
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-yellow-400 transition-all">
+                    <div class="relative overflow-hidden h-52">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/400x300/1a1a1a/facc15?text=Fast+Food'">
+                        <span class="absolute top-4 right-4 bg-yellow-400 text-black font-bold text-xs px-3 py-1 rounded-full shadow">
+                            <i class="fa-solid fa-star"></i> ${item.rating}
+                        </span>
+                    </div>
+                    <div class="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs text-yellow-400 font-bold uppercase tracking-wider">${item.category}</span>
+                            <h3 class="text-xl font-black text-white mt-1">${item.name}</h3>
+                            <p class="text-zinc-400 text-xs mt-2 leading-relaxed">${item.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-zinc-800">
+                            <span class="text-2xl font-black text-yellow-400">$${item.price.toFixed(2)}</span>
+                            <button onclick="addToCart(${item.id})" class="bg-yellow-400 text-black font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-yellow-300 transition-all flex items-center gap-2 shadow">
+                                <i class="fa-solid fa-plus"></i> ${currentLang === 'ru' ? 'В заказ' : 'Add to Order'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Functions
+        function addToCart(id) {
+            const item = menuItems.find(m => m.id === id);
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCartBadge();
+            renderCartItems();
+            showToast(`Added "${item.name}" to your order!`);
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.innerText = totalQty;
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items');
+            const totalElem = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-center py-12">Your cart is currently empty.</p>`;
+                totalElem.innerText = `$0.00`;
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, index) => {
+                total += item.price * item.qty;
+                return `
+                    <div class="flex items-center justify-between bg-zinc-900 p-4 rounded-2xl border border-zinc-800">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" alt="${item.name}" class="w-14 h-14 rounded-xl object-cover" onerror="this.src='https://placehold.co/100x100/1a1a1a/facc15?text=Food'">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${item.name}</h4>
+                                <p class="text-yellow-400 text-xs font-bold">$${item.price.toFixed(2)} x ${item.qty}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeQty(${index}, 1)" class="w-7 h-7 bg-zinc-800 text-white rounded-lg flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                            <button onclick="changeQty(${index}, -1)" class="w-7 h-7 bg-zinc-800 text-white rounded-lg flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalElem.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function openCart() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCart() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast("Your cart is empty!");
+                return;
+            }
+            showToast("Order placed successfully! 20-min delivery started 🚀");
+            cart = [];
+            updateCartBadge();
+            renderCartItems();
+            closeCart();
+        }
+
+        // Promo Code Copy
+        function copyPromoCode() {
+            const code = "BOTTOM15";
+            // Clipboard fallback using execCommand
+            const textArea = document.createElement("textarea");
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Promo code BOTTOM15 copied! Use at checkout.");
+            } catch (err) {
+                showToast("Could not copy code automatically.");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            msg.innerText = message;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderMenu();
+        };
+    </script>
+</body>
+</html>
